@@ -2,12 +2,14 @@
 #include <QQmlApplicationEngine>
 
 #include "httprequestandparse.h"
+#include "database.h"
 
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     qmlRegisterType<HTTPRequestAndParse>("HttpRequestAndParse", 1, 0, "HttpRequestAndParse");
+    qmlRegisterType<Database>("Database", 1, 0, "Database");
 
     QGuiApplication app(argc, argv);
 

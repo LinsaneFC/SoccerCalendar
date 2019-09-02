@@ -1,27 +1,31 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
-import QtQuick.Controls 2.5
+import QtQuick.Controls 2.4
+import QtQuick.Controls.Styles 1.4
 
 import HttpRequestAndParse 1.0
+import Database 1.0
 
 Window {
+    id: root
     visible: true
-    width: 640
-    height: 480
+    width: 1200
+    height: 800
     title: qsTr("Hello World")
 
-    HttpRequestAndParse{
-        id: httpRequestAndParse
-    }
+    Rectangle{
+        id: background
+        anchors.fill: parent
+        color: "transparent"
 
-    Button{
-        id: button
-        width: 100
-        height: width
-        text: "Get Premier League Results"
-        onClicked: {
-            httpRequestAndParse.getPremierLeagueResults();
+        Database{
+
         }
+
+        HttpRequestAndParse{
+            id: httpRequestAndParse
+        }
+
     }
 
 }

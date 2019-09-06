@@ -37,18 +37,18 @@ Window {
                 }
 
                 Image {
-                    visible: eventModel.enevtsForDate(styleData.date).length > 0
+                    visible: eventModel.eventsForDate(styleData.date).length > 0
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.margins: -1
                     width: 12
                     height: width
-                    source: "qrc:/images/eventindicator.png"
+//                    source: "qrc:/images/eventindicator.png"
                 }
 
                 Label {
                     id: dayDelegateText
-                    text: stlyeData.date.getDate()
+                    text: styleData.date.getDate()
                     anchors.centerIn: parent
                     color: "Black"
                     }

@@ -1,5 +1,5 @@
-//#ifndef EVENT_H
-//#define EVENT_H
+#ifndef EVENT_H
+#define EVENT_H
 
 #include <QObject>
 #include <QDateTime>
@@ -9,31 +9,31 @@ class Event : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString name READ name Write setName NOTIFY nameChanged)
-    Q_PROPERTY(QDateTime startDate READ startDate WRITE setStartDate NOTIFY startDateChanged)
-    Q_PROPERTY(QDateTime endDate READ endDate WRITE setEndDate NOTIFY endDateChanged)
+    Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(QDateTime startDate READ getStartDate WRITE setStartDate NOTIFY startDateChanged)
+    Q_PROPERTY(QDateTime endDate READ getEndDate WRITE setEndDate NOTIFY endDateChanged)
 
 public:
-    explicit Event(QObject *parent = 0);
+    explicit Event(QObject *parent = nullptr);
 
-    QString name() const;
+    QString getName() const;
     void setName(const QString &name);
 
-    QDateTime startDate() const;
+    QDateTime getStartDate() const;
     void setStartDate(const QDateTime &startDate);
 
-    QDateTime endDate() const;
+    QDateTime getEndDate() const;
     void setEndDate(const QDateTime &endDate);
 
 signals:
     void nameChanged(const QString &name);
     void startDateChanged(const QDateTime &startDate);
-    void endDateChanged(const QDateTime &endDate):
+    void endDateChanged(const QDateTime &endDate);
 
 private:
-    QString mName;
-    QDateTime mStartDate;
-    QDateTime mEndDate;
+    QString m_name;
+    QDateTime m_start_date;
+    QDateTime m_end_date;
 };
 
-/*#endif*/ // EVENT_H
+#endif // EVENT_H

@@ -6,41 +6,41 @@ Event::Event(QObject *parent) :
 
 }
 
-QString Event::name() const
+QString Event::getName() const
 {
-    return mName;
+    return m_name;
 }
 
 void Event::setName(const QString &name)
 {
-    if (name != mName) {
-        mName = name;
-        emit nameChanged(mName);
+    if (name != m_name) {
+        m_name = name;
+        emit nameChanged(m_name);
     }
 }
 
-QDateTime Event::startDate() const
+QDateTime Event::getStartDate() const
 {
-    return mStartDate;
+    return m_start_date;
 }
 
 void Event::setStartDate(const QDateTime &startDate)
 {
-    if (startDate != mStartDate) {
-        mStartDate = startDate;
-        emit startDateChanged(mStartDate);
+    if (startDate != m_start_date) {
+        m_start_date = startDate;
+        emit startDateChanged(m_start_date);
     }
 }
 
-QDateTime Event::endDate() const
+QDateTime Event::getEndDate() const
 {
-    return mEndDate;
+    return m_end_date;
 }
 
 void Event::setEndDate(const QDateTime &endDate)
 {
-    if (endDate != mEndDate) {
-        mEndDate = endDate;
-        emit endDateChanged(mEndDate);
+    if (endDate != m_end_date) {
+        m_end_date = endDate;
+        emit endDateChanged(m_end_date);
     }
 }

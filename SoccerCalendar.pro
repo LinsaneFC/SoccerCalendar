@@ -14,6 +14,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         database.cpp \
+        event.cpp \
         httprequestandparse.cpp \
         main.cpp
 
@@ -32,4 +33,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     database.h \
+    event.h \
     httprequestandparse.h

@@ -5,6 +5,7 @@ import QtQuick.Controls.Styles 1.1
 import QtQuick.Controls 1.4
 
 import HttpRequestAndParse 1.0
+import Database 1.0
 
 Window {
     visible: true
@@ -15,6 +16,23 @@ Window {
 //        anchors.fill: parent
 //        color: "red"
 //    }
+
+    Timer{
+        interval: 4000
+        onTriggered: {
+            db.query("")
+        }
+
+    }
+
+    Database{
+        id: db
+    }
+
+    HttpRequestAndParse{
+        id: httpRequest
+    }
+
 
     Homepage{ }
 

@@ -72,8 +72,23 @@ void HTTPRequestAndParse::getMatches(){
     QSqlDatabase::database().transaction();
     qDebug() << insert.execBatch();
     QSqlDatabase::database().commit();
-    qDebug() << insert.lastError().text();
+    qDebug() << "HTTPRequestAndParse::getMatches() - Error:" << insert.lastError().text();
 
 }
+
+
+/*
+ ********************* QUERIES ******************************
+ *
+ * Selecting Winning Team Name
+ * SELECT CASE winner
+ *       WHEN 'HOME_TEAM'
+ *           THEN homeTeam
+ *       ELSE awayTeam
+ *       END 'Winner'
+ *   FROM match
+ *
+ *
+*/
 
 

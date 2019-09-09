@@ -3,9 +3,14 @@
 
 #include <QDebug>
 #include <QObject>
+#include <QVariantList>
+#include <QVariantMap>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QSqlRecord>
+#include <QSqlField>
+
 
 class Database : public QObject
 {
@@ -13,7 +18,7 @@ class Database : public QObject
 public:
     explicit Database(QObject * parent = nullptr);
 
-//    Q_INVOKABLE QVariantList query(const QString &query);
+    Q_INVOKABLE QVariantList query(const QString &query);
 
 signals:
 

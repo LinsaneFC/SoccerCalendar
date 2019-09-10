@@ -40,14 +40,12 @@ void HTTPRequestAndParse::getMatches(){
 //    });
 
     QSqlQuery insert;
-    insert.prepare("INSERT INTO match VALUES (?,?,?,?,?,?,?,?)");
+    insert.prepare("INSERT INTO match VALUES (?,?,?,?,?,?)");
 
     QVariantList matchIds;
     QVariantList winners;
     QVariantList homeScores;
     QVariantList awayScores;
-    QVariantList homeTeams;
-    QVariantList awayTeams;
     QVariantList homeTeamIds;
     QVariantList awayTeamIds;
 
@@ -55,8 +53,6 @@ void HTTPRequestAndParse::getMatches(){
     winners << "HOME_TEAM";
     homeScores << 2;
     awayScores << 1;
-    homeTeams << "Liverpool";
-    awayTeams << "Chelsea";
     homeTeamIds << 12;
     awayTeamIds << 24;
 
@@ -64,8 +60,6 @@ void HTTPRequestAndParse::getMatches(){
     insert.addBindValue(winners);
     insert.addBindValue(homeScores);
     insert.addBindValue(awayScores);
-    insert.addBindValue(homeTeams);
-    insert.addBindValue(awayTeams);
     insert.addBindValue(homeTeamIds);
     insert.addBindValue(awayTeamIds);
 

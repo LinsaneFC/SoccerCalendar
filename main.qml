@@ -116,7 +116,7 @@ Window {
                 id: eventsListView
                 spacing: 4
                 clip: true
-                model: db
+                model: 5
                 header: eventListHeader
                 anchors.fill: parent
                 anchors.margins: 10
@@ -137,7 +137,7 @@ Window {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: "blue"
+                        color: "yellow"
                     }
 
                     Column {
@@ -147,21 +147,21 @@ Window {
                         anchors.right: parent.right
                         height: timeLabel.height + nameLabel.height + 8
 
-//                        Label {
-//                            id: nameLabel
-//                            width: parent.width
-//                            wrapMode: Teext.Wrap
-//                            text: (db.homeTeam, "vs", db.awayTeam)
-//                        }
-//                        Label {
-//                            id: timeLabel
-//                            width: parent.width
-//                            wrapMode: Text.Wrap
-//                            text: db.Winner
-//                            color: "orange"
+                        Label {
+                            id: nameLabel
+                            width: parent.width
+                            wrapMode: Text.Wrap
+                            text: "test"
+                        }
+                        Label {
+                            id: timeLabel
+                            width: parent.width
+                            wrapMode: Text.Wrap
+                            text: "test"
+                            color: "orange"
                         }
                     }
                 }
-            }
         }
-//    }
+    }
+}

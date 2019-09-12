@@ -4,23 +4,31 @@ HTTPRequestAndParse::HTTPRequestAndParse(QObject * parent)
     : QObject(parent),
     m_manager(new QNetworkAccessManager()){
 
-    getMatches();
+    getAll();
 
 }
 
+void HTTPRequestAndParse::getAll(){
+    getTeams();
+    getMatches();
+}
+
 void HTTPRequestAndParse::getMatches(){
-    qDebug() << "HTTP:RequestAndParse::getPremierLeagueResults() - Setting URL for Premier League";
+    //    QUrlQuery query;
+    //    query.addQueryItem("status", "FINISHED");
+    //    query.addQueryItem("matchday", "3");
+
+    //    qDebug() << "Query: " << query.query();
+
+    //    url.setQuery(query.query());
+
+    qDebug() << "HTTP:RequestAndParse::getMatches() - Setting URL for Premier League Matches";
 
     QUrl url("http://api.football-data.org/v2/competitions/PL/matches");
-    QUrlQuery query;
-//    query.addQueryItem("status", "FINISHED");
-//    query.addQueryItem("matchday", "3");
 
-//    qDebug() << "Query: " << query.query();
-
-    url.setQuery(query.query());
-    m_request.setUrl(url);
     qDebug() << url;
+
+    m_request.setUrl(url);
     m_request.setRawHeader("X-Auth-Token", "bb9d6838fb1c435bbde0a1759f8dae19");
 
     QNetworkReply * reply = m_manager->get(m_request);
@@ -30,7 +38,7 @@ void HTTPRequestAndParse::getMatches(){
             m_buffer.append(reply->readAll());
     });
 
-    connect(reply, &QNetworkReply::finished, this, [&]{
+    connect(reply, &QNetworkReply::finished, this, [&](){
         QElapsedTimer timer;
         timer.start();
 
@@ -38,11 +46,13 @@ void HTTPRequestAndParse::getMatches(){
         QJsonParseError jsonErr;
 
         jsonDoc = QJsonDocument::fromJson(m_buffer, &jsonErr);
+        m_buffer.clear();
 
         QJsonObject jsonObj = jsonDoc.object();
         QVariantMap map = jsonObj.toVariantMap();
 
         QVariantList matchList = map["matches"].toList();
+
 
         QSqlQuery insert;
         insert.prepare("REPLACE INTO match VALUES (?,?,?,?,?,?,?,?,?)");
@@ -103,10 +113,94 @@ void HTTPRequestAndParse::getMatches(){
         //    homeTeamIds << 64;
         //    awayTeamIds << 68;
 
-
     });
 }
 
+
+void HTTPRequestAndParse::getTeams(){
+    qDebug() << "HTTP:RequestAndParse::getTeams() - Setting URL for Premier League Teams";
+
+    QUrl url("http://api.football-data.org/v2/competitions/PL/teams");
+
+    m_request.setUrl(url);
+    m_request.setRawHeader("X-Auth-Token", "bb9d6838fb1c435bbde0a1759f8dae19");
+
+    QNetworkReply * reply = m_manager->get(m_request);
+
+    connect(reply, &QNetworkReply::readyRead, this, [=](){
+        while(reply->bytesAvailable())
+            m_buffer.append(reply->readAll());
+    });
+
+    connect(reply, &QNetworkReply::finished, this, [&](){
+        QElapsedTimer timer;
+        timer.start();
+
+        QJsonDocument jsonDoc;
+        QJsonParseError jsonErr;
+
+        jsonDoc = QJsonDocument::fromJson(m_buffer, &jsonErr);
+        m_buffer.clear();
+
+        QJsonObject jsonObj = jsonDoc.object();
+        QVariantMap map = jsonObj.toVariantMap();
+
+        QVariantList teamList = map["teams"].toList();
+
+        QSqlQuery insert;
+        insert.prepare("REPLACE INTO team VALUES (?,?,?,?,?,?,?,?)");
+
+        QVariantList teamIds;
+        QVariantList areaIds;
+        QVariantList baseLocations;
+        QVariantList teamNames;
+        QVariantList teamNamesShorts;
+        QVariantList teamNamesThrees;
+        QVariantList teamCrests;
+        QVariantList teamVenues;
+
+        for(auto team : teamList){
+            QVariantMap teamMap = team.toMap();
+            QVariantMap areaMap = teamMap["area"].toMap();
+
+            teamIds << teamMap["id"];
+            areaIds << areaMap["id"];
+            baseLocations << areaMap["name"];
+            teamNames << teamMap["name"];
+            teamNamesShorts << teamMap["shortName"];
+            teamNamesThrees << teamMap["tla"];
+            teamCrests << teamMap["crestUrl"];
+            teamVenues << teamMap["venue"];
+        }
+
+        insert.addBindValue(teamIds);
+        insert.addBindValue(areaIds);
+        insert.addBindValue(baseLocations);
+        insert.addBindValue(teamNames);
+        insert.addBindValue(teamNamesShorts);
+        insert.addBindValue(teamNamesThrees);
+        insert.addBindValue(teamCrests);
+        insert.addBindValue(teamVenues);
+
+
+        QSqlDatabase::database().transaction();
+        qDebug() << insert.execBatch();
+        QSqlDatabase::database().commit();
+        qDebug() << "HTTPRequestAndParse::getTeams() - Error:" << insert.lastError().text();
+        qDebug() << "HTTPRequestAndParse::getTeams() - Insertion took" << timer.elapsed() << "milliseconds";
+
+        /******************** Sample Team **********************/
+        //    teamIds << 57;
+        //    areaIds << 2072;
+        //    baseLocations << "England";
+        //    teamNames << "Arsenal FC";
+        //    teamNamesShorts << "Arsenal";
+        //    teamNamesThrees << "ARS";
+        //    teamCrests << "http://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg";
+        //    teamVenues << "Emirates Stadium";
+
+    });
+}
 
 /*
  ********************* QUERIES ******************************

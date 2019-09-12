@@ -7,9 +7,11 @@
 #include <QUrlQuery>
 #include <QNetworkReply>
 #include <QJsonDocument>
+#include <QJsonObject>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QElapsedTimer>
 
 
 class HTTPRequestAndParse : public QObject
@@ -22,8 +24,6 @@ public:
 
 private:
     void getMatches();
-
-
 
 private:
     QNetworkAccessManager * m_manager;

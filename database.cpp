@@ -11,7 +11,7 @@ Database::Database(QObject * parent)
     QSqlQuery match("CREATE TABLE match (id INT PRIMARY KEY, utcDate TEXT, status TEXT, matchday INT, winner TEXT, homeScore INT, awayScore INT, homeTeam INT, awayTeam INT)");
 
     QSqlQuery dropTeam("DROP TABLE team");
-    QSqlQuery team("CREATE TABLE team (id INT PRIMARY KEY, name TEXT, shortName TEXT, tla TEXT, crestUrl TEXT, venue TEXT)");
+    QSqlQuery team("CREATE TABLE team (id INT PRIMARY KEY, areaID INT, baseLocation TEXT, name TEXT, shortName TEXT, tla TEXT, crestUrl TEXT, venue TEXT)");
 
     qDebug() << "Create match table error: " << match.lastError();
 

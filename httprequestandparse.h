@@ -23,7 +23,10 @@ public:
 
 
 private:
+    void getAll();
     void getMatches();
+    void getTeams();
+
 
 private:
     QNetworkAccessManager * m_manager;

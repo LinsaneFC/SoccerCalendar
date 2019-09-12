@@ -23,57 +23,88 @@ void HTTPRequestAndParse::getMatches(){
     qDebug() << url;
     m_request.setRawHeader("X-Auth-Token", "bb9d6838fb1c435bbde0a1759f8dae19");
 
-//    QNetworkReply * reply = m_manager->get(m_request);
+    QNetworkReply * reply = m_manager->get(m_request);
 
-//    connect(reply, &QNetworkReply::readyRead, this, [=](){
-//        while(reply->bytesAvailable())
-//            m_buffer.append(reply->readAll());
-//    });
+    connect(reply, &QNetworkReply::readyRead, this, [=](){
+        while(reply->bytesAvailable())
+            m_buffer.append(reply->readAll());
+    });
 
-//    connect(reply, &QNetworkReply::finished, this, [&]{
-//        QJsonDocument jsonDoc;
-//        QJsonParseError jsonErr;
+    connect(reply, &QNetworkReply::finished, this, [&]{
+        QElapsedTimer timer;
+        timer.start();
 
-//        jsonDoc = QJsonDocument::fromJson(m_buffer, &jsonErr);
+        QJsonDocument jsonDoc;
+        QJsonParseError jsonErr;
 
-//        QString answer = jsonDoc.toJson(QJsonDocument::Compact);
-//    });
+        jsonDoc = QJsonDocument::fromJson(m_buffer, &jsonErr);
 
-    QSqlQuery insert;
-    insert.prepare("INSERT INTO match VALUES (?,?,?,?,?,?,?,?)");
+        QJsonObject jsonObj = jsonDoc.object();
+        QVariantMap map = jsonObj.toVariantMap();
 
-    QVariantList matchIds;
-    QVariantList winners;
-    QVariantList homeScores;
-    QVariantList awayScores;
-    QVariantList homeTeams;
-    QVariantList awayTeams;
-    QVariantList homeTeamIds;
-    QVariantList awayTeamIds;
+        QVariantList matchList = map["matches"].toList();
 
-    matchIds << 12345;
-    winners << "HOME_TEAM";
-    homeScores << 2;
-    awayScores << 1;
-    homeTeams << "Liverpool";
-    awayTeams << "Chelsea";
-    homeTeamIds << 12;
-    awayTeamIds << 24;
+        QSqlQuery insert;
+        insert.prepare("REPLACE INTO match VALUES (?,?,?,?,?,?,?,?,?)");
 
-    insert.addBindValue(matchIds);
-    insert.addBindValue(winners);
-    insert.addBindValue(homeScores);
-    insert.addBindValue(awayScores);
-    insert.addBindValue(homeTeams);
-    insert.addBindValue(awayTeams);
-    insert.addBindValue(homeTeamIds);
-    insert.addBindValue(awayTeamIds);
+        QVariantList matchIds;
+        QVariantList dates;
+        QVariantList statuses;
+        QVariantList matchdays;
+        QVariantList winners;
+        QVariantList homeScores;
+        QVariantList awayScores;
+        QVariantList homeTeamIds;
+        QVariantList awayTeamIds;
 
-    QSqlDatabase::database().transaction();
-    qDebug() << insert.execBatch();
-    QSqlDatabase::database().commit();
-    qDebug() << "HTTPRequestAndParse::getMatches() - Error:" << insert.lastError().text();
+        for(auto match : matchList){
+            QVariantMap matchMap = match.toMap();
+            QVariantMap scoreMap = matchMap["score"].toMap();
+            QVariantMap fullTimeMap = scoreMap["fullTime"].toMap();
+            QVariantMap homeTeamMap = matchMap["homeTeam"].toMap();
+            QVariantMap awayTeamMap = matchMap["awayTeam"].toMap();
 
+            matchIds << matchMap["id"];
+            dates << matchMap["utcDate"];
+            statuses << matchMap["status"];
+            matchdays << matchMap["matchday"];
+            winners << scoreMap["winner"];
+            homeScores << fullTimeMap["homeTeam"];
+            awayScores << fullTimeMap["awayTeam"];
+            homeTeamIds << homeTeamMap["id"];
+            awayTeamIds << awayTeamMap["id"];
+        }
+
+        insert.addBindValue(matchIds);
+        insert.addBindValue(dates);
+        insert.addBindValue(statuses);
+        insert.addBindValue(matchdays);
+        insert.addBindValue(winners);
+        insert.addBindValue(homeScores);
+        insert.addBindValue(awayScores);
+        insert.addBindValue(homeTeamIds);
+        insert.addBindValue(awayTeamIds);
+
+
+        QSqlDatabase::database().transaction();
+        qDebug() << insert.execBatch();
+        QSqlDatabase::database().commit();
+        qDebug() << "HTTPRequestAndParse::getMatches() - Error:" << insert.lastError().text();
+        qDebug() << "HTTPRequestAndParse::getMatches() - Insertion took" << timer.elapsed() << "milliseconds";
+
+        /******************** Sample Gameday **********************/
+        //    matchIds << 264341;
+        //    dates << "2019-08-09T19:00:00Z";
+        //    statuses << "FINISHED";
+        //    matchdays << 1;
+        //    winners << "HOME_TEAM";
+        //    homeScores << 4;
+        //    awayScores << 1;
+        //    homeTeamIds << 64;
+        //    awayTeamIds << 68;
+
+
+    });
 }
 
 

@@ -97,7 +97,7 @@ void HTTPRequestAndParse::getMatches(){
 
 
         QSqlDatabase::database().transaction();
-        qDebug() << insert.execBatch();
+        insert.execBatch();
         QSqlDatabase::database().commit();
         qDebug() << "HTTPRequestAndParse::getMatches() - Insertion took" << timer.elapsed() << "milliseconds";
         qDebug() << "HTTPRequestAndParse::getMatches() - Error:" << insert.lastError().text();
@@ -184,7 +184,7 @@ void HTTPRequestAndParse::getTeams(){
 
 
         QSqlDatabase::database().transaction();
-        qDebug() << insert.execBatch();
+        insert.execBatch();
         QSqlDatabase::database().commit();
         qDebug() << "HTTPRequestAndParse::getTeams() - Insertion took" << timer.elapsed() << "milliseconds";
         qDebug() << "HTTPRequestAndParse::getTeams() - Error:" << insert.lastError().text();
@@ -205,15 +205,36 @@ void HTTPRequestAndParse::getTeams(){
 /*
  ********************* QUERIES ******************************
  *
- * Selecting Winning Team Name
- * SELECT CASE winner
- *       WHEN 'HOME_TEAM'
- *           THEN homeTeam
- *       ELSE awayTeam
- *       END 'Winner'
- *   FROM match
- *
- *
+
+SELECT CASE winner
+     WHEN 'HOME_TEAM'
+         THEN homeTeam
+     ELSE awayTeam
+     END 'Winner'
+ FROM match
+
+
+
+SELECT name as "Winning Teams"
+FROM team
+WHERE id in (SELECT CASE winner
+     WHEN 'HOME_TEAM' THEN homeTeam
+     WHEN 'AWAY_TEAM' THEN awayTeam
+     END 'Winner'
+FROM match
+WHERE matchday = 1)
+
+
+
+SELECT CASE match.winner
+        WHEN 'HOME_TEAM' then t1.name
+        WHEN 'AWAY_TEAM' then t2.name
+        END 'WINNER', t1.name as Home_Team, t2.name as Away_Team
+FROM match, team as t1, team as t2
+WHERE matchday = 1 and t1.id = homeTeam and t2.id = awayTeam
+
+
+
 */
 
 

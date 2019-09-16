@@ -99,8 +99,8 @@ void HTTPRequestAndParse::getMatches(){
         QSqlDatabase::database().transaction();
         qDebug() << insert.execBatch();
         QSqlDatabase::database().commit();
-        qDebug() << "HTTPRequestAndParse::getMatches() - Error:" << insert.lastError().text();
         qDebug() << "HTTPRequestAndParse::getMatches() - Insertion took" << timer.elapsed() << "milliseconds";
+        qDebug() << "HTTPRequestAndParse::getMatches() - Error:" << insert.lastError().text();
 
         /******************** Sample Gameday **********************/
         //    matchIds << 264341;
@@ -186,8 +186,8 @@ void HTTPRequestAndParse::getTeams(){
         QSqlDatabase::database().transaction();
         qDebug() << insert.execBatch();
         QSqlDatabase::database().commit();
-        qDebug() << "HTTPRequestAndParse::getTeams() - Error:" << insert.lastError().text();
         qDebug() << "HTTPRequestAndParse::getTeams() - Insertion took" << timer.elapsed() << "milliseconds";
+        qDebug() << "HTTPRequestAndParse::getTeams() - Error:" << insert.lastError().text();
 
         /******************** Sample Team **********************/
         //    teamIds << 57;

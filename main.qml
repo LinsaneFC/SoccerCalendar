@@ -63,7 +63,7 @@ Window {
                 Label {
                     id: dayDelegateText
                     anchors.centerIn: parent
-                    color: "Black"
+                    color: "black"
                 }
             }
         }

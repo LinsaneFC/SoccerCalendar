@@ -55,10 +55,11 @@ void HTTPRequestAndParse::getMatches(){
 
 
         QSqlQuery insert;
-        insert.prepare("REPLACE INTO match VALUES (?,?,?,?,?,?,?,?,?)");
+        insert.prepare("REPLACE INTO match VALUES (?,?,?,?,?,?,?,?,?,?)");
 
         QVariantList matchIds;
         QVariantList dates;
+        QVariantList times;
         QVariantList statuses;
         QVariantList matchdays;
         QVariantList winners;
@@ -75,7 +76,14 @@ void HTTPRequestAndParse::getMatches(){
             QVariantMap awayTeamMap = matchMap["awayTeam"].toMap();
 
             matchIds << matchMap["id"];
-            dates << matchMap["utcDate"];
+
+            QString matchUTC = matchMap["utcDate"].toString();
+            QStringRef matchDate(&matchUTC, 0, 10);
+            dates << matchDate.toString();
+
+            QStringRef matchTime(&matchUTC, 11, 8);
+            times << matchTime.toString();
+
             statuses << matchMap["status"];
             matchdays << matchMap["matchday"];
             winners << scoreMap["winner"];
@@ -87,6 +95,7 @@ void HTTPRequestAndParse::getMatches(){
 
         insert.addBindValue(matchIds);
         insert.addBindValue(dates);
+        insert.addBindValue(times);
         insert.addBindValue(statuses);
         insert.addBindValue(matchdays);
         insert.addBindValue(winners);
@@ -233,6 +242,14 @@ SELECT CASE match.winner
 FROM match, team as t1, team as t2
 WHERE matchday = 1 and t1.id = homeTeam and t2.id = awayTeam
 
+
+
+SELECT CASE match.winner
+        WHEN 'HOME_TEAM' then 1
+        WHEN 'AWAY_TEAM' then 0
+        END 'WINNER', t1.name as Home_Team, t2.name as Away_Team, match.homeScore, match.awayScore, t1.crestUrl as homeTeamCrest, t2.crestUrl as awayTeamCrest
+FROM match, team as t1, team as t2
+WHERE match.utcDate = "2019-08-10"  and t1.id = homeTeam and t2.id = awayTeam
 
 
 */

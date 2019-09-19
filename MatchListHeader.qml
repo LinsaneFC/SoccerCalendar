@@ -2,30 +2,45 @@ import QtQuick 2.0
 import QtQuick.Controls 2.5
 
 Component {
-    id: eventListHeader
-
-    Row {
-        id: eventDateRow
-        width: parent.width
-        height: eventDayLabel.height
-        spacing: 10
-
-        Label {
-            id: eventDayLabel
-            text: calendar.selectedDate.getDate()
-            font.pointSize: 35
-        }
-        Column {
-            height: eventDayLabel.height
-
-            Label {
-                text: Qt.locale().standaloneDayName(calendar.selectedDate.getDay(), Locale.LongFormat)
-                font.pointSize: 18
+    id: matchListheader
+    Rectangle{
+        id: headerBackground
+        width: matchListView.width
+        height: matchListView.height / 12
+        z: 2
+        Row {
+            spacing: 0.01 * root.width
+            Rectangle{
+                id: spacing
+                width: parent.width * 0.01
+                height: 1
+                color: "transparent"
             }
+
             Label {
-                text: Qt.locale().standaloneMonthName(calendar.selectedDate.getMonth())
-                      + " " + calendar.selectedDate.toLocaleDateString(Qt.locale(), "yyyy")
-                font.pointSize: 12
+                id: matchDayLabel
+                text: calendar.selectedDate.getDate()
+                font.pointSize: 0.08 * headerBackground.width
+            }
+            Column {
+                height: matchDayLabel.height
+
+                Rectangle{
+                    id: spacing2
+                    width: 1
+                    height: parent.height * 0.1
+                    color: "transparent"
+                }
+
+                Label {
+                    text: Qt.locale().standaloneDayName(calendar.selectedDate.getDay(), Locale.LongFormat)
+                    font.pointSize: 0.5 * matchDayLabel.font.pointSize
+                }
+                Label {
+                    text: Qt.locale().standaloneMonthName(calendar.selectedDate.getMonth())
+                          + " " + calendar.selectedDate.toLocaleDateString(Qt.locale(), "yyyy")
+                    font.pointSize: 0.33 * matchDayLabel.font.pointSize
+                }
             }
         }
     }

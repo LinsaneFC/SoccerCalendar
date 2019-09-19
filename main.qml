@@ -14,13 +14,6 @@ Window {
     height: 800
     title: qsTr("BPL Calendar")
 
-    Timer{
-        interval: 4000
-        onTriggered: {
-            db.query("")
-        }
-    }
-
     Database{
         id: db
     }
@@ -29,44 +22,67 @@ Window {
         id: httpRequest
     }
 
+    ListModel{
+        id: matchModel
+    }
+
     Row {
         id: row
         anchors.fill: parent
-        anchors.margins: 20
-        spacing: 10
+        anchors.margins: parent.width > parent.height ? root.width * 0.02 : root.height * 0.02
+        spacing: parent.width > parent.height ? root.width * 0.01 : root.height * 0.01
 
-        MatchListView{ }
+        MatchListView{
+            model: matchModel
+        }
 
         Calendar {
             id: calendar
-            width: (parent.width > parent.height ? parent.width * 0.6 - parent.spacing : parent.width)
-            height: (parent.height > parent.width ? parent.height * 0.6 - parent.spacing : parent.height)
+            width: root.width * 0.56 - parent.spacing
+            height: root.height * 0.95
             frameVisible: true
             weekNumbersVisible: true
             focus: true
-
-            style: CalendarStyle {
-
-                Rectangle {
-                    anchors.fill: parent
-                    border.color: "White"
-                    color: "transparent"
-                    anchors.margins: 0
-                }
-
-                Image {
-                    anchors.margins: -1
-                    width: 12
-                    height: width
-                }
-
-                Label {
-                    id: dayDelegateText
-                    anchors.centerIn: parent
-                    color: "black"
-                }
+            onSelectedDateChanged: {
+                calendarDelayTimer.start();
             }
-        }
 
+            Timer{
+                id: calendarDelayTimer
+                running: true
+                interval: 1000
+                onTriggered: {
+                    //Function to populate model
+                    populateMatchModel();
+                }
+
+                function populateMatchModel(){
+                    console.log("ran");
+                    matchModel.clear();
+                    var date = Qt.formatDateTime(calendar.selectedDate, "yyyy-MM-dd");
+                    var newQuery = replaceDate(date);
+                    var records = db.query(newQuery);
+                    for(var i = 0; i < records.length; ++i){
+                        var record = records[i];
+                        matchModel.append({winner : record.winner, hTeam : record.hTeam, aTeam : record.aTeam, hScore : record.hScore, aScore : record.aScore, hCrest : record.hCrest, aCrest : record.aCrest});
+                    }
+                }
+
+                function replaceDate(newDate){
+                    var oldQuery = "SELECT CASE match.winner
+                                        WHEN 'HOME_TEAM' then 1
+                                        WHEN 'AWAY_TEAM' then 0
+                                        ELSE -1
+                                        END 'winner', t1.name as hTeam, t2.name as aTeam, match.homeScore as hScore, match.awayScore as aScore, t1.crestUrl as hCrest, t2.crestUrl as aCrest
+                                    FROM match, team as t1, team as t2
+                                    WHERE match.utcDate = \"2019-08-10\"  and t1.id = homeTeam and t2.id = awayTeam"
+                    return oldQuery.replace(/2019-08-10/g, newDate);
+                }
+
+            }
+
+        }
     }
+
+
 }

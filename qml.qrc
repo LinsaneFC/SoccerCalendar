@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>MatchListHeader.qml</file>
         <file>MatchListView.qml</file>
+        <file>MatchListDelegate.qml</file>
     </qresource>
 </RCC>

@@ -1,7 +1,7 @@
 import QtQuick 2.12
 
 ListView {
-    id: eventsListView
+    id: matchListView
     width: root.width * 0.4
     height: calendar.height
     header: MatchListHeader{ }
@@ -11,17 +11,13 @@ ListView {
 
 
     Rectangle{
-        id: eventsBorder
+        id: matchListViewBorder
         anchors.fill: parent
         border.color: "black"
         color: "transparent"
     }
 
-//    delegate: Rectangle {
-//        width: eventsListView.width
-//        height: eventItemColumn.height
-//        anchors.horizontalCenter: parent.horizontalCenter
-//    }
+    delegate: MatchListDelegate{ }
 
 }
 

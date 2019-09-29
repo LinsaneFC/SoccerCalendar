@@ -46,6 +46,7 @@ void HTTPRequestAndParse::getMatches(){
         QJsonParseError jsonErr;
 
         jsonDoc = QJsonDocument::fromJson(m_buffer, &jsonErr);
+        qDebug() << "GetMatches() - m_buffer size" << m_buffer.size();
         m_buffer.clear();
 
         QJsonObject jsonObj = jsonDoc.object();
@@ -68,7 +69,10 @@ void HTTPRequestAndParse::getMatches(){
         QVariantList homeTeamIds;
         QVariantList awayTeamIds;
 
+        int count = 0;
+
         for(auto match : matchList){
+            qDebug() << "getMatch" << count++;
             QVariantMap matchMap = match.toMap();
             QVariantMap scoreMap = matchMap["score"].toMap();
             QVariantMap fullTimeMap = scoreMap["fullTime"].toMap();
@@ -149,6 +153,7 @@ void HTTPRequestAndParse::getTeams(){
         QJsonParseError jsonErr;
 
         jsonDoc = QJsonDocument::fromJson(m_buffer, &jsonErr);
+        qDebug() << "GetTeams() - m_buffer size" << m_buffer.size();
         m_buffer.clear();
 
         QJsonObject jsonObj = jsonDoc.object();
@@ -168,7 +173,9 @@ void HTTPRequestAndParse::getTeams(){
         QVariantList teamCrests;
         QVariantList teamVenues;
 
+        int count = 0;
         for(auto team : teamList){
+            qDebug() << "getTeam" << count++;
             QVariantMap teamMap = team.toMap();
             QVariantMap areaMap = teamMap["area"].toMap();
 

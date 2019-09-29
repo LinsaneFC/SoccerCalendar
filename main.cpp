@@ -1,6 +1,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
+#include <QSslSocket>
+
 #include "httprequestandparse.h"
 #include "database.h"
 

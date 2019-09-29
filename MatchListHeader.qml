@@ -7,7 +7,7 @@ Component {
         id: headerBackground
         width: matchListView.width
         height: matchListView.height / 12
-        z: 2
+        z: 3
         Row {
             spacing: 0.01 * root.width
             Rectangle{

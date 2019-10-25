@@ -9,17 +9,10 @@ import Database 1.0
 
 Window {
     id: root
-    visible: true
     width: 1200
     height: 800
     title: qsTr("BPL Calendar")
-
-    Timer{
-        interval: 4000
-        onTriggered: {
-            db.query("")
-        }
-    }
+    visible: true
 
     Database{
         id: db
@@ -29,44 +22,109 @@ Window {
         id: httpRequest
     }
 
+    ListModel{
+        id: matchModel
+    }
+
+    ListModel{
+        id: emptyModel
+        Component.onCompleted: emptyModel.append({num : 1});
+    }
+
+//   *********************** USED TO SEE FONT TYPES ************************
+//    ListView {
+//        anchors.fill: parent;
+//        model: Qt.fontFamilies()
+
+//        delegate: Item {
+//            height: 40;
+//            width: ListView.view.width
+//            Text {
+//                anchors.centerIn: parent
+//                text: modelData;
+//                font.family: modelData
+//                font.pixelSize: 25
+//            }
+//        }
+//        z: 5
+//    }
+
     Row {
         id: row
         anchors.fill: parent
-        anchors.margins: 20
-        spacing: 10
+        anchors.margins: parent.width > parent.height ? root.width * 0.02 : root.height * 0.02
+        spacing: parent.width > parent.height ? root.width * 0.01 : root.height * 0.01
 
-        MatchListView{ }
+        MatchListView{
+            id: matchListView
+            model: matchModel
+        }
+
+        EmptyListView{
+            id: emptyListView
+        }
 
         Calendar {
             id: calendar
-            width: (parent.width > parent.height ? parent.width * 0.6 - parent.spacing : parent.width)
-            height: (parent.height > parent.width ? parent.height * 0.6 - parent.spacing : parent.height)
+            width: root.width * 0.56 - parent.spacing
+            height: root.height * 0.95
             frameVisible: true
             weekNumbersVisible: true
             focus: true
-
-            style: CalendarStyle {
-
-                Rectangle {
-                    anchors.fill: parent
-                    border.color: "White"
-                    color: "transparent"
-                    anchors.margins: 0
-                }
-
-                Image {
-                    anchors.margins: -1
-                    width: 12
-                    height: width
-                }
-
-                Label {
-                    id: dayDelegateText
-                    anchors.centerIn: parent
-                    color: "black"
-                }
+            onSelectedDateChanged: {
+                calendarDelayTimer.start();
             }
-        }
 
+            Timer{
+                id: calendarDelayTimer
+                running: true
+                interval: 1000
+                onTriggered: {
+                    //Function to populate model
+                    populateMatchModel();
+                }
+
+                function populateMatchModel(){
+                    matchModel.clear();
+                    matchListView.visible = true;
+                    emptyListView.visible = false;
+                    var date = Qt.formatDateTime(calendar.selectedDate, "yyyy-MM-dd");
+                    var newQuery = replaceDate(date);
+                    var records = db.query(newQuery);
+
+                    if(records.length){
+                        for(var i = 0; i < records.length; ++i){
+                            var record = records[i];
+                            if(new Set(["FINISHED", "LIVE", "IN_PLAY", "PAUSED"]).has(record.mStatus))
+                                matchModel.append({mStatus : record.mStatus, mTime : record.mTime, winner : record.winner, hTeam : record.hTeam, aTeam : record.aTeam, hTeamShort : record.hTeamShort, aTeamShort : record.aTeamShort, hScore : record.hScore, aScore : record.aScore, hCrest : record.hCrest, aCrest : record.aCrest});
+                            else
+                                matchModel.append({mStatus : record.mStatus, mTime : record.mTime, winner : record.winner, hTeam : record.hTeam, aTeam : record.aTeam, hTeamShort : record.hTeamShort, aTeamShort : record.aTeamShort, hScore : 0, aScore : 0, hCrest : record.hCrest, aCrest : record.aCrest});
+                        }
+                    }else{
+                        emptyListView.visible = true;
+                        matchListView.visible = false;
+                    }
+
+
+                }
+
+                function replaceDate(newDate){
+                    var oldQuery = "SELECT match.status as mStatus, match.utcTime as mTime,
+                                        CASE match.winner
+                                            WHEN 'HOME_TEAM' then 1
+                                            WHEN 'AWAY_TEAM' then 0
+                                            ELSE -1
+                                            END 'winner',
+                                        t1.name as hTeam, t2.name as aTeam, t1.shortName as hTeamShort, t2.shortName as aTeamShort, match.homeScore as hScore, match.awayScore as aScore, t1.crestUrl as hCrest, t2.crestUrl as aCrest
+                                    FROM match, team as t1, team as t2
+                                    WHERE match.utcDate = \"2019-08-10\"  and t1.id = homeTeam and t2.id = awayTeam";
+                    return oldQuery.replace(/2019-08-10/g, newDate);
+                }
+
+            }
+
+        }
     }
+
+
 }

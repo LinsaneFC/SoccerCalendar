@@ -13,6 +13,8 @@
 #include <QSqlError>
 #include <QElapsedTimer>
 
+#include <QString>
+#include <QStringRef>
 
 class HTTPRequestAndParse : public QObject
 {

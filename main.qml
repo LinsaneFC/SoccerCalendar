@@ -9,12 +9,10 @@ import Database 1.0
 
 Window {
     id: root
-    visible: true
     width: 1200
     height: 800
     title: qsTr("BPL Calendar")
-
-    property var allVisible : true;
+    visible: true
 
     Database{
         id: db
@@ -28,36 +26,45 @@ Window {
         id: matchModel
     }
 
-    ListView {
-        visible: !allVisible
-        anchors.fill: parent;
-        model: Qt.fontFamilies()
-
-        delegate: Item {
-            height: 40;
-            width: ListView.view.width
-            Text {
-                anchors.centerIn: parent
-                text: modelData;
-                font.family: modelData
-                font.pixelSize: 25
-            }
-        }
+    ListModel{
+        id: emptyModel
+        Component.onCompleted: emptyModel.append({num : 1});
     }
 
+//   *********************** USED TO SEE FONT TYPES ************************
+//    ListView {
+//        anchors.fill: parent;
+//        model: Qt.fontFamilies()
+
+//        delegate: Item {
+//            height: 40;
+//            width: ListView.view.width
+//            Text {
+//                anchors.centerIn: parent
+//                text: modelData;
+//                font.family: modelData
+//                font.pixelSize: 25
+//            }
+//        }
+//        z: 5
+//    }
+
     Row {
-        visible: allVisible
         id: row
         anchors.fill: parent
         anchors.margins: parent.width > parent.height ? root.width * 0.02 : root.height * 0.02
         spacing: parent.width > parent.height ? root.width * 0.01 : root.height * 0.01
 
         MatchListView{
+            id: matchListView
             model: matchModel
         }
 
+        EmptyListView{
+            id: emptyListView
+        }
+
         Calendar {
-            visible: allVisible
             id: calendar
             width: root.width * 0.56 - parent.spacing
             height: root.height * 0.95
@@ -79,20 +86,29 @@ Window {
 
                 function populateMatchModel(){
                     matchModel.clear();
+                    matchListView.visible = true;
+                    emptyListView.visible = false;
                     var date = Qt.formatDateTime(calendar.selectedDate, "yyyy-MM-dd");
                     var newQuery = replaceDate(date);
                     var records = db.query(newQuery);
-                    for(var i = 0; i < records.length; ++i){
-                        var record = records[i];
-                        if(new Set(["FINISHED", "LIVE", "IN_PLAY", "POSTPONED", "PAUSED"]).has(record.mStatus))
-                            matchModel.append({mStatus : record.mStatus, mTime : record.mTime, winner : record.winner, hTeam : record.hTeam, aTeam : record.aTeam, hTeamShort : record.hTeamShort, aTeamShort : record.aTeamShort, hScore : record.hScore, aScore : record.aScore, hCrest : record.hCrest, aCrest : record.aCrest});
-                        else
-                            matchModel.append({mStatus : record.mStatus, mTime : record.mTime, winner : record.winner, hTeam : record.hTeam, aTeam : record.aTeam, hTeamShort : record.hTeamShort, aTeamShort : record.aTeamShort, hScore : 0, aScore : 0, hCrest : record.hCrest, aCrest : record.aCrest});
+
+                    if(records.length){
+                        for(var i = 0; i < records.length; ++i){
+                            var record = records[i];
+                            if(new Set(["FINISHED", "LIVE", "IN_PLAY", "PAUSED"]).has(record.mStatus))
+                                matchModel.append({mStatus : record.mStatus, mTime : record.mTime, winner : record.winner, hTeam : record.hTeam, aTeam : record.aTeam, hTeamShort : record.hTeamShort, aTeamShort : record.aTeamShort, hScore : record.hScore, aScore : record.aScore, hCrest : record.hCrest, aCrest : record.aCrest});
+                            else
+                                matchModel.append({mStatus : record.mStatus, mTime : record.mTime, winner : record.winner, hTeam : record.hTeam, aTeam : record.aTeam, hTeamShort : record.hTeamShort, aTeamShort : record.aTeamShort, hScore : 0, aScore : 0, hCrest : record.hCrest, aCrest : record.aCrest});
+                        }
+                    }else{
+                        emptyListView.visible = true;
+                        matchListView.visible = false;
                     }
+
+
                 }
 
                 function replaceDate(newDate){
-
                     var oldQuery = "SELECT match.status as mStatus, match.utcTime as mTime,
                                         CASE match.winner
                                             WHEN 'HOME_TEAM' then 1

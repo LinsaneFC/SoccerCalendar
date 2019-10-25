@@ -4,5 +4,6 @@
         <file>MatchListHeader.qml</file>
         <file>MatchListView.qml</file>
         <file>MatchListDelegate.qml</file>
+        <file>EmptyListView.qml</file>
     </qresource>
 </RCC>

@@ -4,11 +4,8 @@ Rectangle{
     id: delegateBackground
     width: matchListView.width
     height: matchListView.height / 8
-    color: "transparent"
     Rectangle{
         anchors.fill: parent
-//        border.color: "black"
-//        border.width: 2
         color: "transparent"
     }
 
@@ -37,8 +34,6 @@ Rectangle{
             anchors.centerIn: parent
             text: hTeam.length > 13 ? hTeamShort : hTeam
             font.pixelSize: 0.05 * delegateBackground.width
-//            font.bold: winner == 1 ? true : false
-//            font.weight: winner == 1 ? Font.Black : Font.Normal
             style: winner == 1 ? Text.Outline  : Text.Normal
             styleColor: "#72da72"
             font.family: "Gill Sans MT Condensed"
@@ -103,8 +98,6 @@ Rectangle{
             anchors.centerIn: parent
             text: aTeam.length > 13 ? aTeamShort : aTeam
             font.pixelSize: 0.05 * delegateBackground.width
-//            font.bold: winner == 0 ? true : false
-//            font.weight: winner == 0 ? Font.Black : Font.Normal
             style: winner == 0 ? Text.Outline  : Text.Normal
             styleColor: "#72da72"
             font.family: "Gill Sans MT Condensed"
